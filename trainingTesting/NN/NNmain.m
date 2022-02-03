@@ -1,0 +1,34 @@
+clear all
+close all
+
+addpath('src');
+addpath('functions/featureExtraction');
+
+IMG_HEIGHT = 27
+IMG_WIDTH = 18
+
+% -- Load training images from dataset --
+[train_images, train_labels] = loadDataset('face_train.cdataset')
+
+% -- Train the model --
+model = NNTraining(train_images, train_labels)
+
+% -- Load testing images from dataset --
+[test_images, test_labels] = loadDataset('face_test.cdataset')
+
+figure('Name','Test Images')
+for i=1:size(test_images,1)
+    test_image = uint8(reshape(test_images(i,:),IMG_HEIGHT,IMG_WIDTH)); %reshape image back to normal size
+    subplot(6,10,i), imshow(test_image), title(['Label: ', num2str(test_labels(i))])
+end
+
+% -- Test the model --
+tic
+for i=1:size(test_images,1)
+    test_image = test_images(i,:);
+    predictions(i,1) = NNTesting(test_image,model);
+end
+toc
+
+figure
+NNEval = Evaluation(test_images, test_labels, predictions, "Nearest Neighbour Classification");
